@@ -9,21 +9,17 @@ function Doors() {
   const { DOORS } = useContext(InformationContext);
   const [isLocked, setLocked] = useState(false);
   const [scrollPercentage, setScrollPercentage] = useState(0);
-  const onScroll = useCallback(
-    (event) => {
-      const { target } = event;
+  const onScroll = useCallback((event) => {
+    const { target } = event;
 
-      const percentage = target.scrollLeft / target.scrollWidth;
-      setScrollPercentage(percentage);
-    },
-    [setScrollPercentage]
-  );
+    const percentage = target.scrollLeft / target.scrollWidth;
+    setScrollPercentage(percentage);
+  }, []);
 
   const getClassname = useCallback(() => {
     console.log(scrollPercentage);
-    return `door-container-wrapper ${scrollPercentage != 0 && "can-left "}  ${
-      scrollPercentage != 1 && "can-right"
-    }`;
+    return `door-container-wrapper ${scrollPercentage !== 0 && "can-left "}  ${scrollPercentage !== 1 && "can-right"
+      }`;
   }, [scrollPercentage]);
   return (
     <Fade>
@@ -31,7 +27,11 @@ function Doors() {
       <div className={getClassname()} onScroll={onScroll}>
         <div className="door-container">
           {DOORS.map((door) => (
-            <Door {...door} {...{ isLocked, setLocked }} />
+            <Door
+              key={`door${door.url}`}
+              {...door}
+              {...{ isLocked, setLocked }}
+            />
           ))}
         </div>
       </div>

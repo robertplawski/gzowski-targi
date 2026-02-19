@@ -1,11 +1,12 @@
-import { createContext, useContext } from "react";
-import programmingImage from "./assets/programming.svg";
+import { createContext } from "react";
 import builderImage from "./assets/builder.svg";
 import dogImage from "./assets/dog.svg";
+import landscapeImage from "./assets/landscape.svg";
+import measureImage from "./assets/measure.svg";
+import programmingImage from "./assets/programming.svg";
 import serverImage from "./assets/server.svg";
 import solarImage from "./assets/solar-panel.svg";
-import measureImage from "./assets/measure.svg";
-import landscapeImage from "./assets/landscape.svg";
+
 const DOORS = [
   {
     iconImage: dogImage,
@@ -14,6 +15,13 @@ const DOORS = [
     url: "/weterynaria",
     color: "#80DE9C",
     videoId: "wHblUPGnFoM",
+    fortuneWheel: {
+      entries: [
+        ...Array(20)
+          .keys()
+          .map((v) => v + 1),
+      ],
+    },
   },
   {
     iconImage: programmingImage,
@@ -71,8 +79,9 @@ const DOORS = [
   .map(({ value }) => value);
 
 const getByUrl = (target) => {
-  return DOORS.filter((value) => value.url == "/" + target)[0];
+  return DOORS.filter((value) => value.url === `/${target}`)[0];
 };
+
 const contextValue = { DOORS, getByUrl };
 export const InformationContext = createContext(contextValue);
 export default function InformationContextProvider({ children }) {

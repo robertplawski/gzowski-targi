@@ -1,7 +1,7 @@
-import { Link, useNavigate } from "react-router";
-import szkolaImage from "../assets/szkola.jpg";
 import { useCallback, useState } from "react";
-import { Fade, Bounce } from "react-awesome-reveal";
+import { Fade } from "react-awesome-reveal";
+import { useNavigate } from "react-router";
+import szkolaImage from "../assets/szkola.jpg";
 export default function Index() {
   const navigate = useNavigate();
   const [isClicked, setClicked] = useState(false);
@@ -13,21 +13,23 @@ export default function Index() {
     setClicked(true);
     setLocked(true);
     setTimeout(() => navigate("/drzwi"), 800);
-  }, [isLocked, setLocked, setClicked, isClicked, navigate]);
+  }, [isLocked, navigate]);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const fullscreen = useCallback(async () => {
     document.body.requestFullscreen();
     setIsFullscreen(true);
-  }, [setIsFullscreen]);
+  }, []);
   return (
     <Fade>
       <section className={`main-section ${isClicked ? "clicked" : ""}`}>
         {!isFullscreen && (
-          <button onClick={fullscreen} className="fullscreen">
+          <button type="button" onClick={fullscreen} className="fullscreen">
             Fullscreen
           </button>
         )}
 
+        {/** biome-ignore lint/a11y/useAltText: <explanation> */}
+        {/** biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
         <img onClick={onClick} className="school-image" src={szkolaImage} />
         <Fade direction="up" className="title">
           Kliknij, aby poznać naszą szkołę
