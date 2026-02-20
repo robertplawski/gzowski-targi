@@ -7,9 +7,9 @@
 	gap: 1rem;
 }
 
-@media (max-width: 512px) {
+@media (max-width: 511px) {
 	:root {
-		font-size: 12px;
+		font-size: 11px;
 	}
 }
 
@@ -62,7 +62,7 @@
 	display: flex;
 	align-items: center;
 	position: relative;
-	padding-inline: 3rem;
+	padding-inline: 2.5rem;
 	user-select: none;
 }
 .door-container-wrapper::before {
@@ -200,7 +200,7 @@
 	color: white;
 	border-radius: 1rem;
 	padding: 1rem;
-	border: 2px solid #1e1e1e47;
+	border: 1px solid #1e1e1e47;
 	letter-spacing: 1.5px;
 	text-transform: uppercase;
 	background-color: rgba(0, 0, 0, 0.7);
@@ -276,11 +276,12 @@ button.fullscreen {
 	background-color: hsl(60, 100%, 60%);
 	width: 1rem;
 	height: 3rem;
-	translate: 0 0%;
+	translate: 0 25%;
 	clip-path: polygon(50% 100%, 0 0, 100% 0);
 	z-index: 1000;
 }
 .fortune-wheel {
+	user-select: none;
 	background-color: lightgray;
 	box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.25);
 	width: auto;
@@ -290,8 +291,9 @@ button.fullscreen {
 	position: relative;
 }
 .fortune-wheel-card {
+	display: flex;
+	justify-content: center;
 	--color: red;
-	--size: 25%;
 	--rotate: 1;
 	background-color: var(--color);
 	position: absolute;
@@ -301,7 +303,7 @@ button.fullscreen {
 	width: 100%;
 	border-radius: 100%;
 	cursor: grab;
-	clip-path: polygon(calc(var(--size) / 2 * 10) 0, 50% 50%, 0 0);
+	clip-path: polygon(calc(var(--size) * var(--length) / 4) 0, 50% 50%, 0 0);
 }
 .fortune-wheel-pole {
 	position: absolute;
@@ -312,18 +314,49 @@ button.fullscreen {
 	background-color: white;
 }
 .fortune-wheel-hint {
+	font-size: 1.25rem;
+	transition:
+		200ms opacity,
+		200ms scale;
 	pointer-events: none;
 	position: absolute;
 	z-index: 1000;
 	background-color: rgba(0, 0, 0, 0.6);
 	backdrop-filter: blur(4px);
-	translate: 0 50%;
+	translate: 0 20%;
 	cursor: pointer;
-	font-weight: 400;
+	font-weight: 600;
 	padding: 1rem;
 	border-radius: 1rem;
 	border: 3px solid rgba(100, 100, 100, 0.8);
 	box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.25);
+}
+.fortune-wheel-popup {
+	transition:
+		200ms opacity,
+		200ms scale;
+	pointer-events: none;
+	position: absolute;
+	z-index: 1000;
+	font-size: 3rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	background-color: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(4px);
+	translate: 0 25%;
+	cursor: pointer;
+	padding: 1rem;
+	border-radius: 1rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	border: 3px solid rgba(100, 100, 100, 0.8);
+	box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.25);
+}
+.fortune-wheel-popup > .small {
+	opacity: 0.67;
+	font-size: 1rem;
 }
 .fortune-wheel-pole-wrapper {
 	display: flex;
@@ -334,4 +367,26 @@ button.fullscreen {
 	position: absolute;
 	width: 100%;
 	z-index: 10;
+}
+.invisible {
+	scale: 0;
+	opacity: 0;
+}
+.fortune-wheel-card-text {
+	position: absolute;
+	font-size: 2.5rem;
+	font-weight: 500;
+	word-spacing: 0.25rem;
+	letter-spacing: 0.25rem;
+	text-shadow:
+		1px 1px 0px #000,
+		-1px -1px 0px #000,
+		1px -1px 0px #000,
+		-1px 1px 0px #000;
+
+	translate: -45% 1.5rem;
+	text-align: center;
+	color: white;
+	text-wrap: wrap;
+	z-index: 2000;
 }
