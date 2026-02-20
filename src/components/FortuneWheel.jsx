@@ -4,17 +4,46 @@ export default function FortuneWheel({ entries }) {
   const [result, setResult] = useState(null);
   const [hasReset, setHasReset] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const fortuneWheelRef = useRef(null);
   const fraction = (index) => (index + 2) / entries.length;
 
+  const preSpin = (e) => {
+    return;
+    if (isSpinning) return;
+    if (!hasReset) return;
+    if (!isDragging) return;
+    if (!fortuneWheelRef || !fortuneWheelRef.current) return;
+    const { movementX, movementY } = e;
+    const sum = movementX + movementY;
+    if (!fortuneWheelRef.current.style.rotate) {
+      fortuneWheelRef.current.style.rotate = 0 + "deg";
+    }
+    const newrot =
+      parseInt(fortuneWheelRef.current.style.rotate.replaceAll("deg", "")) +
+      sum +
+      "deg";
+    fortuneWheelRef.current.animate([{ rotate: newrot }], {
+      duration: 0,
+      fill: "forwards",
+    });
+  };
+
   const spin = () => {
+    if (!fortuneWheelRef || !fortuneWheelRef.current) return;
     if (!hasReset) {
+      fortuneWheelRef.current.animate([{ rotate: "0deg" }], {
+        duration: 800,
+        fill: "forwards",
+      });
+
       setHasReset(true);
       return;
     }
     if (isSpinning) return;
-    if (!fortuneWheelRef || !fortuneWheelRef.current) return;
+
+    setIsDragging(false);
 
     const randomIndex = Math.round(Math.random() * entries.length);
 
@@ -61,7 +90,13 @@ export default function FortuneWheel({ entries }) {
       <div className="fortune-wheel-flap"></div>
 
       {/** biome-ignore lint/a11y/noStaticElementInteractions: <explanation> */}
-      <div ref={fortuneWheelRef} className="fortune-wheel" onMouseUp={spin}>
+      <div
+        ref={fortuneWheelRef}
+        className="fortune-wheel"
+        onMouseMove={preSpin}
+        onMouseUp={!isSpinning ? spin : null}
+        onMouseDown={() => setIsDragging(true)}
+      >
         {entries.map((_, index) => (
           <>
             <div

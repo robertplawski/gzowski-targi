@@ -50,3 +50,13 @@ button {
 	cursor: pointer;
 	transition: border-color 0.25s;
 }
+
+@media (prefers-color-scheme: light) {
+	:root {
+		color: rgba(0, 0, 0, 0.92);
+		background-color: #ffffff;
+	}
+	button {
+		color: rgba(255, 255, 255, 0.92);
+	}
+}
