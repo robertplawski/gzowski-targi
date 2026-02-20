@@ -60,6 +60,7 @@ export default function FortuneWheel({ entries }) {
 
       <div className="fortune-wheel-flap"></div>
 
+      {/** biome-ignore lint/a11y/noStaticElementInteractions: <explanation> */}
       <div ref={fortuneWheelRef} className="fortune-wheel" onMouseUp={spin}>
         {entries.map((_, index) => (
           <>
