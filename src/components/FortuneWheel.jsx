@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 export default function FortuneWheel({ entries }) {
   const [result, setResult] = useState(null);
@@ -6,20 +6,15 @@ export default function FortuneWheel({ entries }) {
   const [isSpinning, setIsSpinning] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
+  const [startingAngle, setStartingAngle] = useState(0);
   const [debug, setDebug] = useState("");
 
   const fortuneWheelRef = useRef(null);
   const fraction = (index) => (index + 2) / entries.length;
 
-  const preSpin = (e) => {
-    if (isSpinning) return;
-    if (!hasReset) return;
-    if (!isDragging) return;
-    if (!fortuneWheelRef || !fortuneWheelRef.current) return;
-
-    const { current: wheel } = fortuneWheelRef;
-
+  const calulateAngle = (wheel, e) => {
     const rect = wheel.getBoundingClientRect();
+
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
 
@@ -27,43 +22,66 @@ export default function FortuneWheel({ entries }) {
     const dy = e.clientY - centerY;
 
     const angle = Math.atan2(dy, dx);
-    const degrees = angle * (180 / Math.PI);
+    return angle;
+  };
 
-    if (!fortuneWheelRef.current.style.rotate) {
-      fortuneWheelRef.current.style.rotate = `${0}deg`;
-    }
+  const preSpin = useCallback(
+    (e) => {
+      if (isSpinning) return;
+      if (!hasReset) return;
+      if (!isDragging) return;
+      if (!fortuneWheelRef || !fortuneWheelRef.current) return;
 
-    fortuneWheelRef.current.style.rotate = `${degrees}deg`;
+      const { current: wheel } = fortuneWheelRef;
+
+      const angle = calulateAngle(wheel, e);
+
+      const degrees = (angle - startingAngle) * (180 / Math.PI);
+
+      if (!wheel.style.rotate) {
+        wheel.style.rotate = `${0}deg`;
+      }
+
+      wheel.style.rotate = `${degrees}deg`;
+    },
+    [startingAngle, hasReset, isDragging, isSpinning],
+  );
+
+  const reset = () => {
+    if (!fortuneWheelRef || !fortuneWheelRef.current) return;
+    if (hasReset) return;
+
+    const duration = 400;
+    const currentRotation =
+      (fortuneWheelRef.current.style.rotate.replaceAll("deg", "") % 360) +
+      "deg";
+
+    const finalRotation = `${currentRotation < 180 ? 360 : 0}deg`;
+    fortuneWheelRef.current.animate(
+      [{ rotate: currentRotation }, { rotate: finalRotation }],
+      {
+        duration,
+      },
+    );
+    setTimeout(
+      () => (fortuneWheelRef.current.style.rotate = "0deg"),
+      duration * 0.9,
+    );
+
+    setHasReset(true);
   };
 
   const spin = () => {
-    if (!fortuneWheelRef || !fortuneWheelRef.current) return;
     if (!hasReset) {
-      const duration = 400;
-      const currentRotation =
-        (fortuneWheelRef.current.style.rotate.replaceAll("deg", "") % 360) +
-        "deg";
-
-      const finalRotation = `${currentRotation < 180 ? 360 : 0}deg`;
-      fortuneWheelRef.current.animate(
-        [{ rotate: currentRotation }, { rotate: finalRotation }],
-        {
-          duration,
-        },
-      );
-      setTimeout(
-        () => (fortuneWheelRef.current.style.rotate = "0deg"),
-        duration,
-      );
-
-      setHasReset(true);
+      reset();
       return;
     }
+    if (!fortuneWheelRef || !fortuneWheelRef.current) return;
     if (isSpinning) return;
 
     setIsDragging(false);
 
-    const startingAngle = fortuneWheelRef.current.style.rotate || "0deg";
+    const startingDegrees = fortuneWheelRef.current.style.rotate || "0deg";
 
     const randomIndex = Math.round(Math.random() * entries.length);
 
@@ -74,7 +92,7 @@ export default function FortuneWheel({ entries }) {
     const dramaticLeeway = (360 / entries.length) * (Math.random() - 0.5) * 0.9;
     const rotation = `${revolutions * 360 + randomOffset + dramaticLeeway}deg`;
 
-    const keyframes = [{ rotate: startingAngle }, { rotate: rotation }];
+    const keyframes = [{ rotate: startingDegrees }, { rotate: rotation }];
 
     const randomDurationModifier = 1000 * Math.random() * 3;
 
@@ -97,6 +115,35 @@ export default function FortuneWheel({ entries }) {
     setHasReset(false);
     setResult(randomIndex);
     setTimeout(() => setIsSpinning(false), cooldown);
+  };
+
+  const onPressedUp = (e) => {
+    e.currentTarget.releasePointerCapture(e.pointerId);
+
+    if (!isSpinning) {
+      setIsDragging(false);
+      spin();
+    }
+  };
+
+  const onMove = preSpin;
+
+  const onLeave = (e) => {
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    if (!isDragging) return;
+    if (!isSpinning) {
+      setIsDragging(false);
+      spin();
+    }
+  };
+
+  const onPressedDown = (e) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+
+    if (fortuneWheelRef.current)
+      setStartingAngle(calulateAngle(fortuneWheelRef.current, e));
+
+    if (!isSpinning) setIsDragging(true);
   };
 
   return (
@@ -125,23 +172,10 @@ export default function FortuneWheel({ entries }) {
         <div
           ref={fortuneWheelRef}
           className="fortune-wheel"
-          onMouseMove={preSpin}
-          onMouseLeave={() => {
-            if (!isDragging) return;
-            if (!isSpinning) {
-              setIsDragging(false);
-              spin();
-            }
-          }}
-          onMouseUp={() => {
-            if (!isSpinning) {
-              setIsDragging(false);
-              spin();
-            }
-          }}
-          onMouseDown={() => {
-            if (!isSpinning) setIsDragging(true);
-          }}
+          onPointerMove={onMove}
+          onPointerLeave={onLeave}
+          onPointerUp={onPressedUp}
+          onPointerDown={onPressedDown}
         >
           {entries.map((_, index) => (
             <>
