@@ -39,15 +39,22 @@ export default function FortuneWheel({ entries }) {
   const spin = () => {
     if (!fortuneWheelRef || !fortuneWheelRef.current) return;
     if (!hasReset) {
-      // Dont think i need that
-      /*const duration = 200;
-      fortuneWheelRef.current.animate([{ rotate: "0deg" }], {
-        duration,
-      });
+      const duration = 400;
+      const currentRotation =
+        (fortuneWheelRef.current.style.rotate.replaceAll("deg", "") % 360) +
+        "deg";
+
+      const finalRotation = `${currentRotation < 180 ? 360 : 0}deg`;
+      fortuneWheelRef.current.animate(
+        [{ rotate: currentRotation }, { rotate: finalRotation }],
+        {
+          duration,
+        },
+      );
       setTimeout(
         () => (fortuneWheelRef.current.style.rotate = "0deg"),
         duration,
-      );*/
+      );
 
       setHasReset(true);
       return;
