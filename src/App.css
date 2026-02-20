@@ -291,7 +291,6 @@ button.fullscreen {
 	aspect-ratio: 1 / 1;
 	border-radius: 100%;
 	position: relative;
-	transition: 300ms rotate;
 }
 .fortune-wheel-card {
 	display: flex;
